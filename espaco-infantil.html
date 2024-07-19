@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aqui é o Espaço Infantil, crie você mesmo!</title>
+    <link rel="stylesheet" href="styles/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Seu avatar</h1>
+        <div id="avatarBuilder">
+            <!-- Adicione aqui as imagens para construção do avatar -->
+            <div class="options">
+                <h2>Sua cor de pele?</h2>
+                <div class="option" draggable="true" data-part="pele">
+                    <img src="" alt="Branca" id="peleBranca">
+                    <p>Branca</p>
+                </div>
+                <div class="option" draggable="true" data-part="pele">
+                    <img src="" alt="Parda" id="peleParda">
+                    <p>Parda</p>
+                </div>
+                <div class="option" draggable="true" data-part="pele">
+                    <img src="" alt="Preta" id="pelePreta">
+                    <p>Preta</p>
+                </div>
+            </div>
+
+            <div class="options">
+                <h2>Seu cabelo?</h2>
+                <div class="option" draggable="true" data-part="cabelo">
+                    <img src="" alt="Crespo Curto" id="cabeloCrespoCurto">
+                    <p>Crespo Curto</p>
+                </div>
+                <div class="option" draggable="true" data-part="cabelo">
+                    <img src="" alt="Crespo Longo" id="cabeloCrespoLongo">
+                    <p>Crespo Longo</p>
+                </div>
+                <div class="option" draggable="true" data-part="cabelo">
+                    <img src="" alt="Liso Curto" id="cabeloLisoCurto">
+                    <p>Liso Curto</p>
+                </div>
+                <div class="option" draggable="true" data-part="cabelo">
+                    <img src="" alt="Liso Longo" id="cabeloLisoLongo">
+                    <p>Liso Longo</p>
+                </div>
+            </div>
+
+            <div class="options">
+                <h2>O que gosta de vestir?</h2>
+                <div class="option" draggable="true" data-part="roupa">
+                    <img src="" alt="Vestido 1" id="vestido1">
+                    <p>Vestido 1</p>
+                </div>
+                <div class="option" draggable="true" data-part="roupa">
+                    <img src="" alt="Vestido 2" id="vestido2">
+                    <p>Vestido 2</p>
+                </div>
+                <div class="option" draggable="true" data-part="roupa">
+                    <img src="" alt="Camisa e Short 1" id="camisaShort1">
+                    <p>Camisa e Short 1</p>
+                </div>
+                <div class="option" draggable="true" data-part="roupa">
+                    <img src="" alt="Camisa e Short 2" id="camisaShort2">
+                    <p>Camisa e Short 2</p>
+                </div>
+            </div>
+
+            <div class="options">
+                <h2>Como está se sentindo antes da consulta?</h2>
+                <div class="option" draggable="true" data-part="emocao">
+                    <img src="" alt="Alegre" id="emocaoAlegre">
+                    <p>Alegre</p>
+                </div>
+                <div class="option" draggable="true" data-part="emocao">
+                    <img src="" alt="Triste" id="emocaoTriste">
+                    <p>Triste</p>
+                </div>
+                <div class="option" draggable="true" data-part="emocao">
+                    <img src="" alt="Raiva" id="emocaoRaiva">
+                    <p>Raiva</p>
+                </div>
+                <div class="option" draggable="true" data-part="emocao">
+                    <img src="" alt="Ansioso" id="emocaoAnsioso">
+                    <p>Ansioso</p>
+                </div
+
+                <div class="option" draggable="true" data-part="emocao">
+                    <img src="" alt="Desconfiado" id="emocaoDesconfiado">
+                    <p>Desconfiado</p>
+                </div>
+                <div class="option" draggable="true" data-part="emocao">
+                    <img src="" alt="Medo" id="emocaoMedo">
+                    <p>Medo</p>
+                </div>
+            </div>
+
+            <div id="avatarCanvas" class="avatar-canvas">
+                <!-- Área onde o avatar será montado -->
+                <h2>Construa seu Avatar aqui!</h2>
+            </div>
+            <button id="confirmarAvatar">Confirmar Avatar</button>
+        </div>
+    </div>
+    <script src="scripts/script.js"></script>
+</body>
+</html>
