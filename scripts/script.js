@@ -1,9 +1,12 @@
 document.addEventListener('DOMContentLoaded', function() {
     const cadastroCriancaForm = document.getElementById('cadastroCriancaForm');
-    const cadastroDentistaForm = document.getElementById('cadastroDentistaForm');
-    const mensagemErro = document.getElementById('mensagemErro');
+    const loginForm = document.getElementById('loginForm');
+    const mensagemErroCadastro = document.getElementById('mensagemErroCadastro');
+    const mensagemErroLogin = document.getElementById('mensagemErroLogin');
     const confirmarAvatarButton = document.getElementById('confirmarAvatar');
+    const confirmarEmocaoButton = document.getElementById('confirmarEmocao');
     const avatarCanvas = document.getElementById('avatarCanvas');
+    let consultaIndex = 1;
 
     // Função para validar formulário
     function isFormValid(form) {
@@ -17,14 +20,18 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Função para mostrar mensagem de erro
-    function showError(message) {
-        mensagemErro.textContent = message;
+    function showError(element, message) {
+        element.textContent = message;
     }
 
     // Função para salvar dados no localStorage
-    function saveData(key, formData) {
-        const data = Object.fromEntries(formData.entries());
+    function saveData(key, data) {
         localStorage.setItem(key, JSON.stringify(data));
+    }
+
+    // Função para carregar dados do localStorage
+    function loadData(key) {
+        return JSON.parse(localStorage.getItem(key));
     }
 
     // Event listener para cadastro de criança
@@ -33,54 +40,71 @@ document.addEventListener('DOMContentLoaded', function() {
             event.preventDefault();
 
             if (isFormValid(cadastroCriancaForm)) {
-                saveData('crianca', new FormData(cadastroCriancaForm));
-                window.location.href = 'espaco-infantil.html';
+                const formData = new FormData(cadastroCriancaForm);
+                const data = Object.fromEntries(formData.entries());
+                saveData('crianca', data);
+                window.location.href = '#login';
             } else {
-                showError('Campos a serem preenchidos!');
+                showError(mensagemErroCadastro, 'Campos a serem preenchidos!');
             }
         });
     }
 
-    // Event listener para cadastro de dentista
-    if (cadastroDentistaForm) {
-        cadastroDentistaForm.addEventListener('submit', function(event) {
+    // Event listener para login
+    if (loginForm) {
+        loginForm.addEventListener('submit', function(event) {
             event.preventDefault();
 
-            if (isFormValid(cadastroDentistaForm)) {
-                saveData('dentista', new FormData(cadastroDentistaForm));
+            const username = document.getElementById('loginUsuario').value.trim();
+            const password = document.getElementById('loginSenha').value.trim();
+
+            const storedCrianca = loadData('crianca');
+
+            if (username === 'odontopediatra' && password === 'dentista123') {
                 window.location.href = 'espaco-dentista.html';
+            } else if (storedCrianca && username === storedCrianca.nomeCrianca && password === storedCrianca.senhaCrianca) {
+                window.location.href = 'espaco-infantil.html';
             } else {
-                showError('Campos a serem preenchidos!');
+                showError(mensagemErroLogin, 'Usuário ou senha incorretos!');
             }
         });
     }
 
-    // Funções para arrastar e soltar imagens
-    if (avatarCanvas) {
+    // Funções para clicar e posicionar imagens
+    if (avatarCanvas && confirmarAvatarButton) {
         const options = document.querySelectorAll('.option img');
         options.forEach(option => {
-            option.addEventListener('dragstart', handleDragStart);
+            option.addEventListener('click', handleImageClick);
         });
-
-        avatarCanvas.addEventListener('dragover', handleDragOver);
-        avatarCanvas.addEventListener('drop', handleDrop);
     }
 
-    function handleDragStart(event) {
-        event.dataTransfer.setData('text/plain', event.target.id);
-    }
-
-    function handleDragOver(event) {
-        event.preventDefault();
-    }
-
-    function handleDrop(event) {
-        event.preventDefault();
-        const id = event.dataTransfer.getData('text/plain');
-        const img = document.getElementById(id).cloneNode();
+    function handleImageClick(event) {
+        const id = event.target.id;
+        const img = document.getElementById(id).cloneNode(true);
+        img.style.width = '100px'; // Ajuste o tamanho conforme necessário
+        img.style.height = 'auto'; // Manter a proporção
         img.style.position = 'absolute';
-        img.style.left = `${event.clientX - avatarCanvas.offsetLeft}px`;
-        img.style.top = `${event.clientY - avatarCanvas.offsetTop}px`;
+
+        // Posicionar imagens em locais específicos dependendo da parte do corpo
+        switch (event.target.dataset.part) {
+            case 'pele':
+                img.style.left = '50px';
+                img.style.top = '50px';
+                break;
+            case 'cabelo':
+                img.style.left = '50px';
+                img.style.top = '0px';
+                break;
+            case 'roupa':
+                img.style.left = '50px';
+                img.style.top = '150px';
+                break;
+            case 'emocao':
+                img.style.left = '150px';
+                img.style.top = '100px';
+                break;
+        }
+
         avatarCanvas.appendChild(img);
     }
 
@@ -91,39 +115,81 @@ document.addEventListener('DOMContentLoaded', function() {
             avatarCanvas.querySelectorAll('img').forEach(img => {
                 avatarParts.push(img.id);
             });
-            localStorage.setItem('avatar', JSON.stringify(avatarParts));
+            const storedCrianca = loadData('crianca') || {};
+            const consulta = {
+                preAtendimento: avatarParts.find(part => part.includes('emocao')),
+                postAtendimento: null,
+            };
+            storedCrianca.consultas = storedCrianca.consultas || [];
+            storedCrianca.consultas.push(consulta);
+            saveData('crianca', storedCrianca);
             window.location.href = 'em-atendimento.html';
         });
     }
 
-    // Função para exibir ficha do paciente e do dentista
-    function displayFicha() {
-        const pacienteData = JSON.parse(localStorage.getItem('crianca'));
-        const dentistaData = JSON.parse(localStorage.getItem('dentista'));
-
-        if (pacienteData) {
-            const fichaPaciente = document.getElementById('fichaPaciente');
-            fichaPaciente.innerHTML = `
-                <p>Nome: ${pacienteData.nomeCrianca}</p>
-                <p>Data de Nascimento: ${pacienteData.dataNascimento}</p>
-                <p>Nome do Responsável: ${pacienteData.nomeResponsavel}</p>
-                <p>Email do Responsável: ${pacienteData.emailResponsavel}</p>
-            `;
+    // Carregar o avatar e permitir alteração da emoção na segunda página
+    if (confirmarEmocaoButton) {
+        const storedCrianca = loadData('crianca');
+        if (storedCrianca && storedCrianca.consultas.length > 0) {
+            const lastConsulta = storedCrianca.consultas[storedCrianca.consultas.length - 1];
+            if (lastConsulta.preAtendimento) {
+                const img = document.createElement('img');
+                img.src = `./imagens/${lastConsulta.preAtendimento}.png`;
+                img.style.width = '100px';
+                img.style.height = 'auto';
+                img.style.position = 'absolute';
+                img.style.left = '150px';
+                img.style.top = '100px';
+                avatarCanvas.appendChild(img);
+            }
         }
 
-        if (dentistaData) {
-            const fichaDentista = document.getElementById('fichaDentista');
-            fichaDentista.innerHTML = `
-                <p>Nome: ${dentistaData.nomeDentista}</p>
-                <p>Tempo de Atuação: ${dentistaData.tempoAtuacao}</p>
-                <p>Email: ${dentistaData.emailDentista}</p>
+        const options = document.querySelectorAll('.option img');
+        options.forEach(option => {
+            option.addEventListener('click', function(event) {
+                avatarCanvas.querySelectorAll('img').forEach(img => {
+                    if (img.dataset.part === 'emocao') {
+                        avatarCanvas.removeChild(img);
+                    }
+                });
+                handleImageClick(event);
+            });
+        });
+
+        confirmarEmocaoButton.addEventListener('click', function() {
+            const newEmotion = avatarCanvas.querySelector('img[data-part="emocao"]').id;
+            storedCrianca.consultas[storedCrianca.consultas.length - 1].postAtendimento = newEmotion;
+            saveData('crianca', storedCrianca);
+            window.location.href = 'espaco-dentista.html';
+        });
+    }
+
+    // Função para exibir relatório no Espaço do Dentista
+    function exibirRelatorio() {
+        const storedCrianca = loadData('crianca');
+        if (storedCrianca) {
+            const relatorioDiv = document.getElementById('relatorio');
+            const dentistaNome = 'Dr. Sônia';
+            let relatorioHTML = `
+                <p>Nome: ${storedCrianca.nomeCrianca}, Idade: ${storedCrianca.idadeCrianca}</p>
+                <p>Dentista: ${dentistaNome}</p>
+                <h3>Consultas</h3>
             `;
+
+            storedCrianca.consultas.forEach((consulta, index) => {
+                relatorioHTML += `
+                    <p>Consulta ${index + 1}</p>
+                    <p>Pré-atendimento: ${consulta.preAtendimento}</p>
+                    <p>Pós-atendimento: ${consulta.postAtendimento || 'Ainda não registrado'}</p>
+                `;
+            });
+
+            relatorioDiv.innerHTML = relatorioHTML;
         }
     }
 
-    // Exibir fichas na página de atendimento
-    if (document.getElementById('fichaPaciente') && document.getElementById('fichaDentista')) {
-        displayFicha();
+    // Exibir relatório na página do Espaço do Dentista
+    if (document.getElementById('relatorio')) {
+        exibirRelatorio();
     }
 });
-
